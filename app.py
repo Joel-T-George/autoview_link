@@ -15,8 +15,9 @@ class AutoviewLinkApp(ctk.CTk):
         self.width = self.winfo_screenwidth()
         self.height= self.winfo_screenheight()
 
-        self.title("Autoview_Link")
+        self.title("Autoview Link")
         self.geometry(f"{self.width}x{self.height}")
+        self.minsize(600, 340)
 
        
 

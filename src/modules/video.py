@@ -1,33 +1,58 @@
 import cv2
 from PIL import Image
+import numpy
+import threading
 
+import os
+  # Shows the current working directory
 
 class VideoInterface():
     def __init__(self):
         self.Frame = None
 
-        self.video_source = (
-    "rtspsrc location=rtsp://admin:Dhaksha123@192.168.6.116:554/live/ch00_0 latency=0 ! "
-    "rtph265depay ! h265parse ! avdec_h265 ! videoconvert ! appsink"
-)
+#         self.video_source = (
+#     "rtspsrc location=rtsp://admin:Dhaksha123@192.168.6.116:554/live/ch00_0 latency=0 ! "
+#     "rtph265depay ! h265parse ! avdec_h265 ! videoconvert ! appsink"
+# )             
+        # self.video_source = "filesrc location=/home/dhaksha/autoview_link/test/testImage.png ! decodebin ! imagefreeze ! videoconvert ! appsink"
+        self.video_source = "filesrc location=/home/dhaksha/Downloads/1204911-hd_1920_1080_30fps.mp4 ! decodebin ! videoconvert ! appsink"
         
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(self.video_source, cv2.CAP_GSTREAMER)
         self.running = False
+        self.curFrameArray= []
 
     def start(self):
         self.running = True
+        self.thread = threading.Thread(target=self.startCapture, daemon=True)
+        self.thread.start()
+        print("Started..")
     
     def get_frame(self):
-        if self.running and self.cap.isOpened():
-            ret, frame = self.cap.read()
+        return self.curFrameArray
+    
+    def startCapture(self):
+        while self.running and self.cap.isOpened():
+            ret , frame =self.cap.read()
             if ret:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                return Image.fromarray(frame)
-        return None
-    
+                self.curFrameArray = Image.fromarray(frame)
+            else:
+                print("no Video Frame")
+                print(os.getcwd())
+                noFrame = Image.open("assests/no-signal.png")
+                noFrameArray = numpy.array(noFrame)
+                self.curFrameArray =Image.fromarray(noFrameArray)
+
+            
     def stop(self):
         self.running = False
         self.cap.release()
+
+    def getFrameShape(self):
+        pass
+
+    def isRunning(self):
+        return self.running
 
 
     def dyanamic_resize_image(self, frame, max_width, max_height):

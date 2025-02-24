@@ -1,5 +1,6 @@
 import customtkinter as ctk
-
+from .modules.video import VideoInterface
+from .view.home import Home
 class ManageApplication():
     """
 
@@ -28,10 +29,16 @@ class ManageApplication():
         self.root = root
         self.root.grid_rowconfigure(1, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
+
+        self.Services = {
+            "video":VideoInterface()
+        }
         # Menu Section Created  Here
         self.create_menu_bar()
         self.create_tab_view()
         self.create_status_bar()
+
+        
 
        
     
@@ -57,7 +64,9 @@ class ManageApplication():
         self.tab2 = self.tabview.add("Connection")
         self.tab3 = self.tabview.add("Record")
 
-        ctk.CTkLabel(self.tab1, text="Welcome to Home Tab", font=("Arial", 18)).pack(pady=20)
+        self.sidebar_tab = Home(self.tab1, backend = self.Services)
+        self.sidebar_tab.pack(fill="both", expand=True)
+
         ctk.CTkLabel(self.tab2, text="Settings Tab", font=("Arial", 18)).pack(pady=20)
         ctk.CTkLabel(self.tab3, text="About Tab", font=("Arial", 18)).pack(pady=20)
 
